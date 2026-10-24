@@ -1,0 +1,122 @@
+@baseUrl = http://localhost:5000/api
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhZGNmM2MwZmM4Nzk5YWZlNjAyN2FkMCIsImVtYWlsIjoibmV3dXNlcjFAZXhhbXBsZS5jb20iLCJpYXQiOjE3OTI4NjUyNjAsImV4cCI6MTc5Mjk1MTY2MH0.Y8Q_LQxTHXWEF10sJas3b9w4tHYaA03QE8epJYN_B0A
+
+### 1. Register a new email (Expect: 201 Created)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser1@example.com",
+  "password": "password123"
+}
+
+### 2. Register the same email again (Expect: 409 Conflict)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser1@example.com",
+  "password": "password123"
+}
+
+### 3. Register with a 3-character password (Expect: 400 Bad Request)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser2@example.com",
+  "password": "123"
+}
+
+### 4. Log in with the wrong password (Expect: 401 Unauthorized)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "newuser1@example.com",
+  "password": "wrongpassword"
+}
+
+### 5. Log in correctly (Expect: 200 OK and a token)
+# COPY THE TOKEN FROM THE RESPONSE AND PASTE IT IN @token AT THE TOP
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "newuser1@example.com",
+  "password": "password123"
+}
+
+### 6. GET /api/issues with no token (Expect: 401 Unauthorized)
+GET {{baseUrl}}/issues
+
+### 7. GET /api/issues with a garbage token (Expect: 401 Unauthorized)
+GET {{baseUrl}}/issues
+Authorization: Bearer this_is_a_garbage_invalid_token_string
+
+### 8. Create an issue with no title (Expect: 400 Bad Request)
+POST {{baseUrl}}/issues
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "description": "Missing title test",
+  "severity": "Low",
+  "status": "Open"
+}
+
+### 9. Create an issue with spoofed createdBy (Expect: 201, createdBy should be YOU, not hacker)
+POST {{baseUrl}}/issues
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Spoof test",
+  "severity": "Medium",
+  "status": "Open",
+  "createdBy": "hacker@example.com"
+}
+
+### 10. GET /api/issues/abc (Expect: 400 Bad Request - Invalid Mongo ID format)
+GET {{baseUrl}}/issues/abc
+Authorization: Bearer {{token}}
+
+### 11. GET a valid-looking id that doesn’t exist (Expect: 404 Not Found)
+# Using a structurally valid 24-character hex string that isn't in your DB
+GET {{baseUrl}}/issues/5f8d0d55b54764421b7156d9
+Authorization: Bearer {{token}}
+
+### 12. Update an issue (Expect: 200 OK)
+# Replace the ID in the URL with a real issue ID from your database
+PUT {{baseUrl}}/issues/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "In Progress"
+}
+
+### 13. Delete an issue (Expect: 200 OK or 204 No Content)
+# Replace the ID in the URL with the same real issue ID
+DELETE {{baseUrl}}/issues/6ace7576ac53f82b3a8a5dd0
+Authorization: Bearer {{token}}
+
+### 14. Fetch the deleted issue (Expect: 404 Not Found)
+GET {{baseUrl}}/issues/6ace7576ac53f82b3a8a5dd0
+Authorization: Bearer {{token}}
+
+### 15. Query Parameters: ?q=login (Expect: 200 OK, matching issues)
+GET {{baseUrl}}/issues?q=login
+Authorization: Bearer {{token}}
+
+### 16. Query Parameters: ?status=Open (Expect: 200 OK, Open issues)
+GET {{baseUrl}}/issues?status=Open
+Authorization: Bearer {{token}}
+
+### 17. Query Parameters Combined (Expect: 200 OK, matching both)
+GET {{baseUrl}}/issues?q=login&status=Open
+Authorization: Bearer {{token}}
+
+### 18. Regex crash test (Expect: 200 OK or empty array, NOT a 500 crash)
+GET {{baseUrl}}/issues?q=(
+Authorization: Bearer {{token}}

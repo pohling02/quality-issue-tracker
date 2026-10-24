@@ -1,0 +1,102 @@
+<pre>DEBUG issues={{ issues().length }} stats={{ stats() | json }}</pre>
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Issue Dashboard</h2>
+    <a routerLink="/issues/new" class="btn btn-primary">+ Create Issue</a>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card text-center bg-danger text-white shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Open</h5>
+          <h3>{{ stats()['Open'] || 0 }}</h3>    
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center bg-warning shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">In Progress</h5>
+          <h3>{{ stats()['In Progress'] || 0 }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card text-center bg-success text-white shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Closed</h5>
+          <h3>{{ stats()['Closed'] || 0 }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filters -->
+  <div class="row mb-3 bg-light p-3 rounded border">
+    <div class="col-md-6 mb-2 mb-md-0">
+      <input type="text" class="form-control" placeholder="Search issues..." [formControl]="searchControl">
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" [(ngModel)]="selectedStatus" (change)="onFilterChange()">
+        <option value="">All Statuses</option>
+        <option value="Open">Open</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Closed">Closed</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" [(ngModel)]="selectedSeverity" (change)="onFilterChange()">
+        <option value="">All Severities</option>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="table-responsive">
+    <table class="table table-hover align-middle border bg-white">
+      <thead class="table-light">
+        <tr>
+          <th>Title</th>
+          <th>Severity</th>
+          <th>Status</th>
+          <th>Created By</th>
+          <th>Date</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let issue of issues()">
+          <td class="fw-bold">{{ issue.title }}</td>
+          <td>
+            <span class="badge" 
+              [ngClass]="{'bg-danger': issue.severity === 'High', 'bg-warning text-dark': issue.severity === 'Medium', 'bg-secondary': issue.severity === 'Low'}">
+              {{ issue.severity }}
+            </span>
+          </td>
+          <td>
+            <span class="badge" 
+              [ngClass]="{'bg-danger': issue.status === 'Open', 'bg-warning text-dark': issue.status === 'In Progress', 'bg-success': issue.status === 'Closed'}">
+              {{ issue.status }}
+            </span>
+          </td>
+          <td>{{ issue.createdBy?.email || 'Unknown' }}</td>
+          <td>{{ issue.createdAt | date:'shortDate' }}</td>
+          <td class="text-end">
+            <!-- Edit Link -->
+            <a [routerLink]="['/issues', issue._id, 'edit']" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+            <!-- Delete Button -->
+            <button class="btn btn-sm btn-outline-danger" (click)="deleteIssue(issue._id)">Delete</button>
+          </td>
+        </tr>
+        <tr *ngIf="issues().length === 0">
+          <td colspan="6" class="text-center py-4 text-muted">No issues found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

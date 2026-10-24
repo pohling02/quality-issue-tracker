@@ -1,0 +1,17 @@
+<!-- Navbar only shows if the user is logged in -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4" *ngIf="authService.isLoggedIn()">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/issues">Quality Issue Tracker</a>
+    
+    <div class="d-flex align-items-center">
+      <!-- Displays the email stored in localStorage -->
+      <span class="text-light me-3">{{ authService.getEmail() }}</span>
+      <button class="btn btn-outline-light btn-sm" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- The routed pages (Login, Register, Issues) inject here -->
+<div class="container-fluid">
+  <router-outlet></router-outlet>
+</div>

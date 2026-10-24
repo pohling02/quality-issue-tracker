@@ -1,0 +1,44 @@
+### Register a new user
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+###
+
+### Login
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+
+### Create a new issue
+POST http://localhost:5000/api/issues
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhY2U3MjQwZTJlYzZlMjI1OTQ5NjliMSIsImlhdCI6MTc5MTkxNTM2NCwiZXhwIjoxNzkyMDAxNzY0fQ.XlhTLEKDhRoUXLKgKNWHCPfJ-jlwrg4768V9hbSMmIA
+
+{
+  "title": "Login button broken",
+  "description": "Clicking login does nothing on mobile Safari",
+  "severity": "High",
+  "status": "Open"
+}
+
+###
+
+### Get all issues
+GET http://localhost:5000/api/issues
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhY2U3MjQwZTJlYzZlMjI1OTQ5NjliMSIsImlhdCI6MTc5MTkxNTM2NCwiZXhwIjoxNzkyMDAxNzY0fQ.XlhTLEKDhRoUXLKgKNWHCPfJ-jlwrg4768V9hbSMmIA
+
+###
+
+### Search issues by status and keyword
+GET http://localhost:5000/api/issues?status=Open&q=login
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhY2U3MjQwZTJlYzZlMjI1OTQ5NjliMSIsImlhdCI6MTc5MTkxNTM2NCwiZXhwIjoxNzkyMDAxNzY0fQ.XlhTLEKDhRoUXLKgKNWHCPfJ-jlwrg4768V9hbSMmIA
